@@ -1,5 +1,5 @@
 /**
- * Created by ismar on 24/01/2017.
+ * Created by ismaro3 on 24/01/2017.
  * 8bit-Arithmetic-Logical operations
  */
 
@@ -17,7 +17,7 @@ CPU.add_A_r = function(inst){
     CPU._r.f = 0x00; //Clear flags (after having accessed to carry flag)
     var oldA = CPU._r.a;
 
-    //First, add the register and check for half-carry
+    //First, add the register adnd check for half-carry
     CPU._r.a = CPU._r.a + valueToAdd;
     if((((oldA & 0xf) + (valueToAdd & 0xf)) & 0x10)== 0x10) {
         CPU._r.f |=0x20;
@@ -278,5 +278,91 @@ CPU.and_A_HL = function(inst){
     CPU._r.f |= 0x20; //So H is always to 1
 
     CPU._r.a &= 0xFF;
+
+};
+
+
+//A = A xor r
+CPU.xor_A_r = function(inst){
+    CPU._r.f = 0x00;    //Clear flags
+    valueToAND = CPU.getRegisterFromCode(inst.r2);
+    CPU._r.a = CPU._r.a ^ valueToAND;
+
+    if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
+    CPU._r.f &=  0x80; //So N and C are always to 0
+    CPU._r.f &=  0x80; //N,H and C always set to 0
+
+    CPU._r.a &= 0xFF;
+
+};
+
+//A = A xor n
+CPU.xor_A_n = function(inst){
+    CPU._r.f = 0x00;    //Clear flags
+    valueToAND = inst.n;
+    CPU._r.a = CPU._r.a ^ valueToAND;
+
+    if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
+    CPU._r.f &=  0x80; //So N and C are always to 0
+    CPU._r.f &=  0x80; //N,H and C always set to 0
+
+    CPU._r.a &= 0xFF;
+
+};
+
+//A = A xor HL
+CPU.xor_A_HL = function(inst){
+    CPU._r.f = 0x00;    //Clear flags
+    valueToAND = (CPU._r.h << 8 | CPU._r.l );
+    CPU._r.a = CPU._r.a ^ valueToAND;
+
+    if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
+    CPU._r.f &=  0x80; //N,H and C always set to 0
+
+    CPU._r.a &= 0xFF;
+
+
+};
+
+
+//A = A or r
+CPU.or_A_r = function(inst){
+    CPU._r.f = 0x00;    //Clear flags
+    valueToAND = CPU.getRegisterFromCode(inst.r2);
+    CPU._r.a = CPU._r.a | valueToAND;
+
+    if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
+    CPU._r.f &=  0x80; //So N and C are always to 0
+    CPU._r.f &=  0x80; //N,H and C always set to 0
+
+    CPU._r.a &= 0xFF;
+
+};
+
+//A = A or n
+CPU.or_A_n = function(inst){
+    CPU._r.f = 0x00;    //Clear flags
+    valueToAND = inst.n;
+    CPU._r.a = CPU._r.a | valueToAND;
+
+    if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
+    CPU._r.f &=  0x80; //So N and C are always to 0
+    CPU._r.f &=  0x80; //N,H and C always set to 0
+
+    CPU._r.a &= 0xFF;
+
+};
+
+//A = A or HL
+CPU.or_A_HL = function(inst){
+    CPU._r.f = 0x00;    //Clear flags
+    valueToAND = (CPU._r.h << 8 | CPU._r.l );
+    CPU._r.a = CPU._r.a | valueToAND;
+
+    if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
+    CPU._r.f &=  0x80; //N,H and C always set to 0
+
+    CPU._r.a &= 0xFF;
+
 
 };

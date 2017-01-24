@@ -1,5 +1,5 @@
 /**
- * Created by ismar on 24/01/2017.
+ * Created by ismaro3 on 24/01/2017.
  */
 
 QUnit.test( "SUM", function( assert ) {
@@ -445,4 +445,173 @@ QUnit.test( "AND_A_HL", function( assert ) {
 });
 
 
-//Todo: sure the H flag is right?
+QUnit.test( "XOR_A_r", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0x3F;
+    CPU._r.e = 0x3F;
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x8A;
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x3,
+        n: 0x0F
+    };
+
+    CPU.xor_A_r(inst);
+
+    assert.equal(CPU._r.a, 0x00,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x80, "Z flag is set to 1");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x00,"N flag is set to 0");
+    assert.equal(CPU._r.f&0x10,0x00,"C flag is set to 0");
+
+
+});
+
+
+QUnit.test( "XOR_A_n", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0xFF;
+    CPU._r.e = 0x3F;
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x8A;
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x3,
+        n: 0x0F
+    };
+
+    CPU.xor_A_n(inst);
+
+    assert.equal(CPU._r.a, 0xF0,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 0");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x00,"N flag is set to 0");
+    assert.equal(CPU._r.f&0x10,0x00,"C flag is set to 0");
+
+
+});
+
+QUnit.test( "XOR_A_HL", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0xFF;
+    CPU._r.e = 0x3F;
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x8A;
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x3,
+        n: 0x0F
+    };
+
+    CPU.xor_A_HL(inst);
+
+    assert.equal(CPU._r.a, 0x75,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 0");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x00,"N flag is set to 0");
+    assert.equal(CPU._r.f&0x10,0x00,"C flag is set to 0");
+
+
+});
+
+QUnit.test( "OR_A_r", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0x00;
+    CPU._r.e = 0x00;
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x0F;
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x3,
+        n: 0x03
+    };
+
+    CPU.or_A_r(inst);
+
+    assert.equal(CPU._r.a, 0x00,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x80, "Z flag is set to 1");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x00,"N flag is set to 0");
+    assert.equal(CPU._r.f&0x10,0x00,"C flag is set to 0");
+
+
+});
+QUnit.test( "OR_A_n", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0x5A;
+    CPU._r.e = 0x00;
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x0F;
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x3,
+        n: 0x03
+    };
+
+    CPU.or_A_n(inst);
+
+    assert.equal(CPU._r.a, 0x5B,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 10");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x00,"N flag is set to 0");
+    assert.equal(CPU._r.f&0x10,0x00,"C flag is set to 0");
+
+
+});
+
+
+QUnit.test( "OR_A_HL", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0x5A;
+    CPU._r.e = 0x00;
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x0F;
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x3,
+        n: 0x03
+    };
+
+    CPU.or_A_HL(inst);
+
+    assert.equal(CPU._r.a, 0x5F,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 0");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x00,"N flag is set to 0");
+    assert.equal(CPU._r.f&0x10,0x00,"C flag is set to 0");
+
+
+});
+
+
