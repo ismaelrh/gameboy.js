@@ -54,6 +54,33 @@ CPU = {
 
     },
 
+    setRegisterFromCode: function(code,value){
+        switch(code){
+            case 0x7:
+                CPU._r.a = value;
+                break;
+            case 0x0:
+                CPU._r.b = value;
+                break;
+            case 0x1:
+                CPU._r.c = value;
+                break;
+            case 0x2:
+                CPU._r.d = value;
+                break;
+            case 0x3:
+                CPU._r.e = value;
+                break;
+            case 0x4:
+                CPU._r.h = value;
+                break;
+            case 0x5:
+                CPU._r.l = value;
+                break;
+        }
+
+    },
+
     extractByte: function(inst,pos){
         var mask = 0xFF << (8*pos); //Create mask
         var res = (inst&mask) >> (8*pos); //Extract byte

@@ -366,3 +366,193 @@ CPU.or_A_HL = function(inst){
 
 
 };
+
+//Substracts register r from A
+CPU.cp_A_r = function(inst){
+
+    var valueToSubstract = CPU.getRegisterFromCode(inst.r2);
+
+    CPU._r.f = 0x00; //Clear flags (after having accessed to carry flag)
+
+    //Save the result in another variable
+    var comparisonResult = CPU._r.a - valueToSubstract;
+
+    if((((CPU._r.a & 0xf) - (valueToSubstract & 0xf)) & 0x10)== 0x10) {
+        CPU._r.f |=0x20;
+    }
+
+    if((comparisonResult & 0xFF) == 0x0) CPU._r.f |= 0x80;    //Set Z=0 if result is 0
+    if(comparisonResult < 0 ) CPU._r.f |= 0x10;           //A carry occurred
+
+    CPU._r.f |= 0x40; //N flag always set on substract
+
+    //A is not modified!
+
+};
+
+
+//A = A - n
+CPU.cp_A_n = function(inst){
+
+    var valueToSubstract = inst.n;
+
+    CPU._r.f = 0x00; //Clear flags (after having accessed to carry flag)
+
+    //Save the result in another variable
+    var comparisonResult = CPU._r.a - valueToSubstract;
+
+    if((((CPU._r.a & 0xf) - (valueToSubstract & 0xf)) & 0x10)== 0x10) {
+        CPU._r.f |=0x20;
+    }
+
+    if((comparisonResult & 0xFF) == 0x0) CPU._r.f |= 0x80;    //Set Z=0 if result is 0
+    if(comparisonResult < 0 ) CPU._r.f |= 0x10;           //A carry occurred
+
+    CPU._r.f |= 0x40; //N flag always set on substract
+
+    //A is not modified!
+
+};
+
+
+//A = A - HL
+CPU.cp_A_HL = function(inst){
+
+    var valueToSubstract = (CPU._r.h << 8 | CPU._r.l );
+
+    CPU._r.f = 0x00; //Clear flags (after having accessed to carry flag)
+
+    //Save the result in another variable
+    var comparisonResult = CPU._r.a - valueToSubstract;
+
+    if((((CPU._r.a & 0xf) - (valueToSubstract & 0xf)) & 0x10)== 0x10) {
+        CPU._r.f |=0x20;
+    }
+
+    if((comparisonResult & 0xFF) == 0x0) CPU._r.f |= 0x80;    //Set Z=0 if result is 0
+    if(comparisonResult < 0 ) CPU._r.f |= 0x10;           //A carry occurred
+
+    CPU._r.f |= 0x40; //N flag always set on substract
+
+    //A is not modified!
+
+};
+
+
+//r = r + 1
+CPU.inc_r =  function(inst){
+
+    CPU._r.f &= 0x10; //Clear all flags except C, that remains unchanged
+    var r = inst.r1; //Register to act is r1
+    var oldValue = CPU.getRegisterFromCode(r);
+    var newValue = oldValue +1;
+
+
+
+    //Check for half-carry
+    if((((oldValue & 0xf) + (0x1 & 0xf)) & 0x10)== 0x10) {
+        CPU._r.f |=0x20;
+    }
+
+
+    if(((newValue) & 0xFF) == 0x0) CPU._r.f |= 0x80;    //Set Z=0 if result is 0
+    if((newValue) > 0xFF) CPU._r.f |= 0x10;           //A carry occurred
+
+
+    CPU.setRegisterFromCode(r,newValue&0xFF); //Truncate and save value
+
+};
+
+//HL = HL + 1
+CPU.inc_HL =  function(inst){
+
+    CPU._r.f &= 0x10; //Clear all flags except C, that remains unchanged
+    var oldValue = (CPU._r.h << 8 | CPU._r.l );
+    var newValue = oldValue +1;
+
+
+    //Check for half-carry
+    //todo: it seems that is as in the previous cases, as it says the GAMEBOY CPU MANUAL, so it would be right
+    if((((oldValue & 0xf) + (0x1 & 0xf)) & 0x10)== 0x10) {
+        CPU._r.f |=0x20;
+    }
+
+    if(((newValue) & 0xFFFF) == 0x0) CPU._r.f |= 0x80;    //Set Z=0 if result is 0
+    if((newValue) > 0xFFFF) CPU._r.f |= 0x10;           //A carry occurred
+
+    var h = newValue >> 8;
+    var l = newValue & 0xFF;
+
+    CPU._r.h = h & 0xFF;
+    CPU._r.l = l & 0xFF;
+    //CPU.setRegisterFromCode(r,newValue&0xFF); //Truncate and save value
+
+};
+
+//r = r - 1
+CPU.dec_r =  function(inst){
+
+    CPU._r.f &= 0x10; //Clear all flags except C, that remains unchanged
+    var r = inst.r1; //Register to act is r1
+    var oldValue = CPU.getRegisterFromCode(r);
+    var newValue = oldValue  - 1;
+
+
+
+    //Check for half-carry
+    //todo: it seems that is as in the previous cases, as it says the GAMEBOY CPU MANUAL, so it would be right
+    if((((oldValue & 0xf) - (0x1 & 0xf)) & 0x10)== 0x10) {
+        CPU._r.f |=0x20;
+    }
+
+
+    if(((newValue) & 0xFF) == 0x0) CPU._r.f |= 0x80;    //Set Z=0 if result is 0
+    if((newValue) < 0x00) CPU._r.f |= 0x10;           //A carry occurred
+    CPU._r.f |= 0x40; //N always to 1
+
+
+    CPU.setRegisterFromCode(r,newValue&0xFF); //Truncate and save value
+
+};
+
+//HL = HL - 1
+CPU.dec_HL =  function(inst){
+
+    CPU._r.f &= 0x10; //Clear all flags except C, that remains unchanged
+    var r = inst.r1; //Register to act is r1
+    var oldValue = (CPU._r.h << 8 | CPU._r.l );
+    var newValue = oldValue  - 1;
+
+
+    //Check for half-carry
+    //todo: it seems that is as in the previous cases, as it says the GAMEBOY CPU MANUAL, so it would be right
+    if((((oldValue & 0xf) - (0x1 & 0xf)) & 0x10)== 0x10) {
+        CPU._r.f |=0x20;
+    }
+
+
+    if(((newValue) & 0xFFFF) == 0x0) CPU._r.f |= 0x80;    //Set Z=0 if result is 0
+    if((newValue) < 0x0000) CPU._r.f |= 0x10;           //A carry occurred
+    CPU._r.f |= 0x40; //N always to 1
+
+    var h = newValue >> 8;
+    var l = newValue & 0xFF;
+    CPU._r.h = h & 0xFF;
+    CPU._r.l = l & 0xFF;
+
+};
+
+CPU.cpl =  function(inst){
+
+    CPU._r.f &= 0x90; //Clear all flags except C and Z, that remains unchanged
+
+    CPU._r.a = CPU._r.a ^ 0xFF; //Flips all bits
+    CPU._r.f |= 0x60; //Sets flags N and H to 1
+
+
+};
+
+//todo: repasar el funcionamiento de H en restas
+
+
+

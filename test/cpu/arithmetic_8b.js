@@ -615,3 +615,236 @@ QUnit.test( "OR_A_HL", function( assert ) {
 });
 
 
+
+QUnit.test( "CP_A_r", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0x3C;
+    CPU._r.b = 0x2F;
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x40;
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x0,
+        n: 0x3C
+    };
+
+    CPU.cp_A_r(inst);
+
+    assert.equal(CPU._r.a, 0x3C,"Result is correct (A not changed)");
+    assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 0");
+    assert.equal(CPU._r.f&0x20,0x20,"H flag is set to 1");
+    assert.equal(CPU._r.f&0x40,0x40,"N flag is set to 1");
+    assert.equal(CPU._r.f&0x10,0x00,"C flag is set to 0");
+
+
+});
+
+
+QUnit.test( "CP_A_n", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0x3C;
+    CPU._r.b = 0x2F;
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x40;
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x0,
+        n: 0x3C
+    };
+
+    CPU.cp_A_n(inst);
+
+    assert.equal(CPU._r.a, 0x3C,"Result is correct (A not changed)");
+    assert.equal(CPU._r.f&0x80, 0x80, "Z flag is set to 1");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x40,"N flag is set to 1");
+    assert.equal(CPU._r.f&0x10,0x00,"C flag is set to 0");
+
+
+});
+
+
+QUnit.test( "CP_A_HL", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0x3C;
+    CPU._r.b = 0x2F;
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x40;
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x0,
+        n: 0x3C
+    };
+
+    CPU.cp_A_HL(inst);
+
+    assert.equal(CPU._r.a, 0x3C,"Result is correct (A not changed)");
+    assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 0");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x40,"N flag is set to 1");
+    assert.equal(CPU._r.f&0x10,0x10,"C flag is set to 1");
+
+
+});
+
+QUnit.test( "INC_R", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.c = 0xFF;
+    CPU._r.f = 0x10; //Set carry flag to see if it remains
+
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x1,
+        r2: 0x0,
+        n: 0x0
+    };
+
+    CPU.inc_r(inst);
+
+    assert.equal(CPU._r.c, 0x00,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x80, "Z flag is set to 1");
+    assert.equal(CPU._r.f&0x20,0x20,"H flag is set to 1");
+    assert.equal(CPU._r.f&0x40,0x00,"N flag is set to 0");
+    assert.equal(CPU._r.f&0x10,0x10,"C flag is set to 1");
+
+
+});
+
+QUnit.test( "INC_HL", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.c = 0xFF;
+    CPU._r.f = 0x10; //Set carry flag to see if it remains
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x50;
+
+
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x0,
+        n: 0x0
+    };
+
+    CPU.inc_HL(inst);
+
+    assert.equal(CPU._r.l, 0x51,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 0");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x00,"N flag is set to 0");
+    assert.equal(CPU._r.f&0x10,0x10,"C flag is set to 1");
+
+
+});
+
+QUnit.test( "DEC_r", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.f = 0x10; //Set carry flag to see if it remains
+    CPU._r.l = 0x01;
+
+
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x5, //In 1st!
+        r2: 0x0,
+        n: 0x0
+    };
+
+    CPU.dec_r(inst);
+
+    assert.equal(CPU._r.l, 0x00,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x80, "Z flag is set to 1");
+    assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
+    assert.equal(CPU._r.f&0x40,0x40,"N flag is set to 1");
+    assert.equal(CPU._r.f&0x10,0x10,"C flag is set to 1");
+
+
+});
+
+QUnit.test( "DEC_HL", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.f = 0x10; //Set carry flag to see if it remains
+    CPU._r.h = 0x00;
+    CPU._r.l = 0x00;
+
+
+
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x0,
+        n: 0x0
+    };
+
+    CPU.dec_HL(inst);
+
+    assert.equal(CPU._r.h, 0xFF,"Result is correct");
+    assert.equal(CPU._r.l, 0xFF,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 0");
+    assert.equal(CPU._r.f&0x20,0x20,"H flag is set to 1");
+    assert.equal(CPU._r.f&0x40,0x40,"N flag is set to 1");
+    assert.equal(CPU._r.f&0x10,0x10,"C flag is set to 1");
+
+
+});
+
+
+QUnit.test( "CPL", function( assert ) {
+
+    CPU._init();
+
+    //Sum a and e
+    CPU._r.a = 0x35;
+    CPU._r.f = 0x90; //Set flags to see if they remain.
+
+
+    var inst = {
+        opcode: 0x2,
+        r1: 0x0,
+        r2: 0x0,
+        n: 0x0
+    };
+
+    CPU.cpl(inst);
+
+    assert.equal(CPU._r.a, 0xCA,"Result is correct");
+    assert.equal(CPU._r.f&0x80, 0x80, "Z flag is set to 1");
+    assert.equal(CPU._r.f&0x20,0x20,"H flag is set to 1");
+    assert.equal(CPU._r.f&0x40,0x40,"N flag is set to 1");
+    assert.equal(CPU._r.f&0x10,0x10,"C flag is set to 1");
+
+
+});
+
+
+//todo: DAA operation
