@@ -85,8 +85,9 @@ QUnit.test( "ADD_A_HL", function( assert ) {
 
     //Sum a and e
     CPU._r.a = 0xFF;
-    CPU._r.h = 0x00;
-    CPU._r.l = 0xA;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0xBA;
+    MEM._m[0xBEBA] = 0x000A;
 
     var inst = {
         opcode: 0x2,
@@ -165,8 +166,9 @@ QUnit.test( "ADDC_A_HL", function( assert ) {
 
     //Sum a and e
     CPU._r.a = 0xE1;
-    CPU._r.h = 0x00;
-    CPU._r.l = 0x1E;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0xBA;
+    MEM._m[0xBEBA] = 0x1E;
     CPU._r.f = 0x10;
 
     var inst = {
@@ -251,8 +253,10 @@ QUnit.test( "SUB_A_HL", function( assert ) {
     //Sum a and e
     CPU._r.a = 0x3E;
     CPU._r.e = 0x3E;
-    CPU._r.h = 0x00;
-    CPU._r.l = 0x40;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0xBA;
+    MEM._m[0xBEBA] = 0X40;
+
     //CPU._r.f = 0x10;
 
     var inst = {
@@ -338,8 +342,9 @@ QUnit.test( "SUBC_A_HL", function( assert ) {
     //Sum a and e
     CPU._r.a = 0x3B;
     CPU._r.e = 0x2A;
-    CPU._r.h = 0x00;
-    CPU._r.l = 0x4F;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0xBA;
+    MEM._m[0xBEBA] = 0x4F;
     CPU._r.f = 0x10;
 
     var inst = {
@@ -419,12 +424,13 @@ QUnit.test( "AND_A_n", function( assert ) {
 QUnit.test( "AND_A_HL", function( assert ) {
 
     CPU._init();
+    MEM._init();
 
-    //Sum a and e
     CPU._r.a = 0x5A;
     CPU._r.e = 0x3F;
-    CPU._r.h = 0x00;
-    CPU._r.l = 0x00;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0x3F;
+    MEM._m[0xBE3F] = 0x00;
 
     var inst = {
         opcode: 0x2,
@@ -509,8 +515,9 @@ QUnit.test( "XOR_A_HL", function( assert ) {
     //Sum a and e
     CPU._r.a = 0xFF;
     CPU._r.e = 0x3F;
-    CPU._r.h = 0x00;
-    CPU._r.l = 0x8A;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0xBA;
+    MEM._m[0xBEBA] = 0x8A;
 
     var inst = {
         opcode: 0x2,
@@ -593,8 +600,9 @@ QUnit.test( "OR_A_HL", function( assert ) {
     //Sum a and e
     CPU._r.a = 0x5A;
     CPU._r.e = 0x00;
-    CPU._r.h = 0x00;
-    CPU._r.l = 0x0F;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0xBA;
+    MEM._m[0xBEBA] = 0X0F;
 
     var inst = {
         opcode: 0x2,
@@ -681,8 +689,9 @@ QUnit.test( "CP_A_HL", function( assert ) {
     //Sum a and e
     CPU._r.a = 0x3C;
     CPU._r.b = 0x2F;
-    CPU._r.h = 0x00;
-    CPU._r.l = 0x40;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0xBA;
+    MEM._m[0xBEBA] = 0x40;
 
     var inst = {
         opcode: 0x2,
@@ -736,8 +745,9 @@ QUnit.test( "INC_HL", function( assert ) {
     //Sum a and e
     CPU._r.c = 0xFF;
     CPU._r.f = 0x10; //Set carry flag to see if it remains
-    CPU._r.h = 0x00;
-    CPU._r.l = 0x50;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0xBA;
+    MEM._m[0xBEBA] = 0x50;
 
 
 
@@ -750,7 +760,7 @@ QUnit.test( "INC_HL", function( assert ) {
 
     CPU.inc_HL(inst);
 
-    assert.equal(CPU._r.l, 0x51,"Result is correct");
+    assert.equal(MEM.readByte(0xBEBA), 0x51,"Result is correct");
     assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 0");
     assert.equal(CPU._r.f&0x20,0x00,"H flag is set to 0");
     assert.equal(CPU._r.f&0x40,0x00,"N flag is set to 0");
@@ -793,8 +803,9 @@ QUnit.test( "DEC_HL", function( assert ) {
 
     //Sum a and e
     CPU._r.f = 0x10; //Set carry flag to see if it remains
-    CPU._r.h = 0x00;
-    CPU._r.l = 0x00;
+    CPU._r.h = 0xBE;
+    CPU._r.l = 0xBA;
+    MEM._m[0xBEBA] = 0x00;
 
 
 
@@ -808,8 +819,7 @@ QUnit.test( "DEC_HL", function( assert ) {
 
     CPU.dec_HL(inst);
 
-    assert.equal(CPU._r.h, 0xFF,"Result is correct");
-    assert.equal(CPU._r.l, 0xFF,"Result is correct");
+    assert.equal(MEM.readByte(0xBEBA),0xFF,"Result is correct");
     assert.equal(CPU._r.f&0x80, 0x00, "Z flag is set to 0");
     assert.equal(CPU._r.f&0x20,0x20,"H flag is set to 1");
     assert.equal(CPU._r.f&0x40,0x40,"N flag is set to 1");

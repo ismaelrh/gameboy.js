@@ -76,11 +76,12 @@ CPU.add_A_n =  function(inst){
 
 };
 
-//A = A + HL
+//A = A + @HL
 CPU.add_A_HL =  function(inst){
 
     var addCarry = 0;
-    var valueToAdd = (CPU._r.h << 8 | CPU._r.l ); //Compose HL value
+
+    var valueToAdd = MEM.readByte(CPU.getDoubleRegisterFromCode(2));
 
     //Used for adc operation (variation where carry flag is added)
     if(inst.r1 == 0x1 && (CPU._r.f&0x10) == 0x10){
@@ -197,13 +198,14 @@ CPU.sub_A_n =  function(inst){
 
 };
 
-//Substracts HL from A
+//A = A - @HL
 CPU.sub_A_HL = function(inst){
 
     var subCarry = 0;
 
 
-    var valueToSubstract = (CPU._r.h << 8 | CPU._r.l ); //Compose HL value
+    var valueToSubstract = MEM.readByte(CPU.getDoubleRegisterFromCode(2));
+
 
     //Used for adc operation (variation where carry flag is added)
     if(inst.r1 == 0x3 && (CPU._r.f&0x10) == 0x10){
@@ -270,7 +272,9 @@ CPU.and_A_n = function(inst){
 //A = A and HL
 CPU.and_A_HL = function(inst){
     CPU._r.f = 0x00;    //Clear flags
-    valueToAND = (CPU._r.h << 8 | CPU._r.l );
+
+    var valueToAND = MEM.readByte(CPU.getDoubleRegisterFromCode(2));
+
     CPU._r.a = CPU._r.a & valueToAND;
 
     if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
@@ -313,8 +317,9 @@ CPU.xor_A_n = function(inst){
 //A = A xor HL
 CPU.xor_A_HL = function(inst){
     CPU._r.f = 0x00;    //Clear flags
-    valueToAND = (CPU._r.h << 8 | CPU._r.l );
-    CPU._r.a = CPU._r.a ^ valueToAND;
+    var valueToXOR = MEM.readByte(CPU.getDoubleRegisterFromCode(2));
+
+    CPU._r.a = CPU._r.a ^ valueToXOR;
 
     if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
     CPU._r.f &=  0x80; //N,H and C always set to 0
@@ -328,7 +333,7 @@ CPU.xor_A_HL = function(inst){
 //A = A or r
 CPU.or_A_r = function(inst){
     CPU._r.f = 0x00;    //Clear flags
-    valueToAND = CPU.getRegisterFromCode(inst.r2);
+    var valueToAND = CPU.getRegisterFromCode(inst.r2);
     CPU._r.a = CPU._r.a | valueToAND;
 
     if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
@@ -342,7 +347,7 @@ CPU.or_A_r = function(inst){
 //A = A or n
 CPU.or_A_n = function(inst){
     CPU._r.f = 0x00;    //Clear flags
-    valueToAND = inst.n;
+    var valueToAND = inst.n;
     CPU._r.a = CPU._r.a | valueToAND;
 
     if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
@@ -356,8 +361,8 @@ CPU.or_A_n = function(inst){
 //A = A or HL
 CPU.or_A_HL = function(inst){
     CPU._r.f = 0x00;    //Clear flags
-    valueToAND = (CPU._r.h << 8 | CPU._r.l );
-    CPU._r.a = CPU._r.a | valueToAND;
+    var valueToOR = MEM.readByte(CPU.getDoubleRegisterFromCode(2));
+    CPU._r.a = CPU._r.a | valueToOR;
 
     if(CPU._r.a == 0)  CPU._r.f |= 0x80; //Flag Z = 1 if result is 0
     CPU._r.f &=  0x80; //N,H and C always set to 0
@@ -418,7 +423,7 @@ CPU.cp_A_n = function(inst){
 //A = A - HL
 CPU.cp_A_HL = function(inst){
 
-    var valueToSubstract = (CPU._r.h << 8 | CPU._r.l );
+    var valueToSubstract = MEM.readByte(CPU.getDoubleRegisterFromCode(2));
 
     CPU._r.f = 0x00; //Clear flags (after having accessed to carry flag)
 
@@ -463,11 +468,11 @@ CPU.inc_r =  function(inst){
 
 };
 
-//HL = HL + 1
+//@HL = @HL + 1
 CPU.inc_HL =  function(inst){
 
     CPU._r.f &= 0x10; //Clear all flags except C, that remains unchanged
-    var oldValue = (CPU._r.h << 8 | CPU._r.l );
+    var oldValue = MEM.readByte(CPU.getDoubleRegisterFromCode(2));
     var newValue = oldValue +1;
 
 
@@ -480,12 +485,9 @@ CPU.inc_HL =  function(inst){
     if(((newValue) & 0xFFFF) == 0x0) CPU._r.f |= 0x80;    //Set Z=0 if result is 0
     if((newValue) > 0xFFFF) CPU._r.f |= 0x10;           //A carry occurred
 
-    var h = newValue >> 8;
-    var l = newValue & 0xFF;
+    newValue = newValue & 0xFF; //Truncate
 
-    CPU._r.h = h & 0xFF;
-    CPU._r.l = l & 0xFF;
-    //CPU.setRegisterFromCode(r,newValue&0xFF); //Truncate and save value
+    MEM.writeByte(CPU.getDoubleRegisterFromCode(2),newValue);
 
 };
 
@@ -515,12 +517,12 @@ CPU.dec_r =  function(inst){
 
 };
 
-//HL = HL - 1
+//@HL = @HL - 1
 CPU.dec_HL =  function(inst){
 
     CPU._r.f &= 0x10; //Clear all flags except C, that remains unchanged
-    var r = inst.r1; //Register to act is r1
-    var oldValue = (CPU._r.h << 8 | CPU._r.l );
+
+    var oldValue = MEM.readByte(CPU.getDoubleRegisterFromCode(2));
     var newValue = oldValue  - 1;
 
 
@@ -535,10 +537,9 @@ CPU.dec_HL =  function(inst){
     if((newValue) < 0x0000) CPU._r.f |= 0x10;           //A carry occurred
     CPU._r.f |= 0x40; //N always to 1
 
-    var h = newValue >> 8;
-    var l = newValue & 0xFF;
-    CPU._r.h = h & 0xFF;
-    CPU._r.l = l & 0xFF;
+    newValue =newValue & 0xFF; //Truncate
+
+    MEM.writeByte(CPU.getDoubleRegisterFromCode(2),newValue);
 
 };
 
