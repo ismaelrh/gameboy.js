@@ -81,6 +81,48 @@ CPU = {
 
     },
 
+    getDoubleRegisterFromCode: function(code){
+        switch(code){
+            case 0x0:
+                return (CPU._r.b << 8 | CPU._r.c ); //Compose BC value
+            case 0x1:
+                return (CPU._r.d << 8 | CPU._r.e ); //Compose DE value
+            case 0x2:
+                return (CPU._r.h << 8 | CPU._r.l ); //Compose HL value
+            case 0x3:
+                return CPU._r.sp; //Compose SP value
+        }
+
+    },
+
+    setDoubleRegisterFromCode: function(code,value){
+        var high = (value >> 8) & 0xFF;
+        var low  = (value & 0xFF) & 0xFF;
+
+        switch(code){
+            case 0x0: //Set BC register
+                CPU._r.b = high;
+                CPU._r.c = low;
+                break;
+
+            case 0x1: //Set DE register
+                CPU._r.d = high;
+                CPU._r.e = low;
+                break;
+
+            case 0x2: //Set HL register
+                CPU._r.h = high;
+                CPU._r.l = low;
+                break;
+
+            case 0x3: //Set SP register
+                CPU._r.sp = value & 0xFFFF;
+                break;
+
+        }
+
+    },
+
     extractByte: function(inst,pos){
         var mask = 0xFF << (8*pos); //Create mask
         var res = (inst&mask) >> (8*pos); //Extract byte

@@ -31,7 +31,7 @@ CPU.add_A_r = function(inst){
     }
 
     if((CPU._r.a & 0xFF) == 0x0) CPU._r.f |= 0x80;    //Set Z=0 if result is 0
-    if(CPU._r.a > 0xFF) CPU._r.f |= 0x10;           //A carry occurred
+    if(CPU._r.a > 0xFF) CPU._r.f |= 0x10;           //A carry occurred. No check negative, impossible to overflow the JS 32 bit integer.
     //Half-carry ocurred, from 3rd to 4th bit
 
 
